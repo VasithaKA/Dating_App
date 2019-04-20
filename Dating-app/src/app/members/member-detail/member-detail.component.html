@@ -1,0 +1,73 @@
+<div *ngIf="aUserDetails" class="container mt-4">
+  <div class="row">
+    <h1>{{aUserDetails.result.knownAs}}'s Profile</h1>
+  </div>
+  <div class="row">
+    <div class="col-sm-4">
+      <div class="card">
+        <img src="{{aUserDetails.photoUrl}}" alt="{{aUserDetails.result.knownAs}}" class="card-img-top img-thumbnail">
+
+        <div class="card-body">
+          <div>
+            <strong>Location:</strong>
+            <p>{{aUserDetails.result.city}}, {{aUserDetails.result.country}}</p>
+          </div>
+          <div>
+            <strong>Age:</strong>
+            <p>{{aUserDetails.age}}</p>
+          </div>
+          <div>
+            <strong>Last Active:</strong>
+            <p>{{aUserDetails.result.lastActive | timeAgo}}</p>
+          </div>
+          <div>
+            <strong>Member Since:</strong>
+            <p>{{aUserDetails.result.createdDate | date}}</p>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <div class="btn-group d-flex">
+            <button class="btn btn-primary w-100">Like</button>
+            <button class="btn btn-success w-100">Message</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col-sm-8">
+
+      <div class="tablets rounded">
+        <nav class="navs">
+          <div class="nav nav-tabs" role="tablist">
+            <a class="nav-item nav-link active" data-toggle="tab" href="#About">About {{aUserDetails.result.knownAs}}</a>
+            <a class="nav-item nav-link" data-toggle="tab" href="#Interests">Interests</a>
+            <a class="nav-item nav-link" data-toggle="tab" href="#Photos">Photos</a>
+            <a class="nav-item nav-link" data-toggle="tab" href="#Messages">Messages</a>
+          </div>
+        </nav>
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="About">
+            <h4>Description</h4>
+            <p>{{aUserDetails.result.introduction}}</p>
+            <h4>Looking For</h4>
+            <p>{{aUserDetails.result.lookingFor}}</p>
+          </div>
+          <div class="tab-pane fade" id="Interests">
+            <h4>Interests</h4>
+            <p>{{aUserDetails.result.interests}}</p>
+          </div>
+          <div class="tab-pane fade" id="Photos">
+            <ngx-gallery [options]="galleryOptions" [images]="galleryImages"></ngx-gallery>
+          </div>
+          <div class="tab-pane fade" id="Messages">
+            <p>Messages will go here...</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

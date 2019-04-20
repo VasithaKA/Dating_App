@@ -1,0 +1,7 @@
+<div class="container mt-5">
+  <div class="row">
+    <div *ngFor="let aUserDetails of allUserDetails" class="col-lg-2 col-md-3 col-sm-6">
+      <app-member-card [user]="aUserDetails"></app-member-card>
+    </div>
+  </div>
+</div>
