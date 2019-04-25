@@ -4,7 +4,10 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const checkAuth = require('../middleware/check-auth');
-const ageCalculator = require('../middleware/age-calculator')
+const ageCalculator = require('../middleware/age-calculator');
+const userFilter = require('../middleware/user-filter');
+
+const USERS_PER_PAGE = 6;
 
 require('../models/User');
 const User = mongoose.model('users');
@@ -71,7 +74,7 @@ router.post('/login', async (req, res, next) => {
                 })
             }
             if (result) {
-                const token = jwt.sign({ userName: foundUser.userName, _id: foundUser._id }, process.env.JWT_KEY, { expiresIn: "1h" })
+                const token = jwt.sign({ userName: foundUser.userName, _id: foundUser._id, gender: foundUser.gender }, process.env.JWT_KEY, { expiresIn: "1h" })
                 return res.status(200).json({
                     message: "Login successful",
                     token: token,
@@ -106,16 +109,17 @@ router.patch('/create/:id', checkAuth, async (req, res, next) => {
 
 //Get all user dedails
 router.get('/', checkAuth, async (req, res) => {
-    await User.find({}, { userName: 1, gender: 1, knownAs: 1, createdDate: 1, city: 1, country: 1 }).populate('photos', { url: 1, _id: 0 }, { isMain: true }).exec((err, result) => {
-        if (err) {
-            return res.status(500).json({
-                message: err.name
-            })
-        }
-        var details = []
-        result.forEach(element => {
-            if (element._id != req.loggedInUserData._id) {
-                if (element.photos[0]) {
+    const page = +req.query.page || 1
+    const gender = req.query.gender || userFilter.setGender(req.loggedInUserData.gender)
+    const minAge = +req.query.minAge || 18
+    const maxAge = +req.query.maxAge || 99
+    const orderedList =  req.query.orderedList || "lastActive"
+    await User.find().where('gender', gender).sort('-lastActive').populate('photos', { url: 1, _id: 0 }, { isMain: true }).then(async Users => {
+        var unfilteredDetails = []
+        await Users.forEach(element => {
+            var age = ageCalculator(element.dateOfBirth, res)
+            if (age > minAge && age < maxAge) {
+                if (element._id != req.loggedInUserData._id) {
                     const object = {
                         _id: element._id,
                         userName: element.userName,
@@ -124,32 +128,37 @@ router.get('/', checkAuth, async (req, res) => {
                         createdDate: element.createdDate,
                         city: element.city,
                         country: element.country,
-                        photoUrl: element.photos[0].url
+                        age: age
                     }
-                    details.push(object)
-                } else {
-                    if (element.gender === "male") {
-                        photoUrl = "https://www.bootdey.com/img/Content/avatar/avatar7.png"
+                    if (element.photos[0]) {
+                        object.photoUrl = element.photos[0].url
                     } else {
-                        photoUrl = "http://www.cocoonbag.com/Content/images/feedback2.png"
+                        if (element.gender === "male") {
+                            photoUrl = "https://www.bootdey.com/img/Content/avatar/avatar7.png"
+                        } else {
+                            photoUrl = "http://www.cocoonbag.com/Content/images/feedback2.png"
+                        }
+                        object.photoUrl = photoUrl
                     }
-                    const object = {
-                        _id: element._id,
-                        userName: element.userName,
-                        gender: element.gender,
-                        knownAs: element.knownAs,
-                        createdDate: element.createdDate,
-                        city: element.city,
-                        country: element.country,
-                        photoUrl: photoUrl
-                    }
-                    details.push(object)
+                    unfilteredDetails.push(object)
                 }
             }
         })
-        res.status(200).json(
-            details
-        )
+        var details;
+        if (orderedList === "created") {
+            details = await unfilteredDetails.sort(function(a, b) { return b.createdDate - a.createdDate }).slice((page - 1) * USERS_PER_PAGE,page*USERS_PER_PAGE)
+        } else if (orderedList === "lastActive") {
+            details = await unfilteredDetails.slice((page - 1) * USERS_PER_PAGE,page*USERS_PER_PAGE)
+        }
+        pagination = { previousPage: page - 1, currentPage: page, nextPage: page + 1, lastPage: Math.ceil(unfilteredDetails.length / USERS_PER_PAGE), totalUsers: unfilteredDetails.length }
+        await res.status(200).json({
+            details,
+            pagination
+        })
+    }).catch(error => {
+        return res.status(500).json({
+            message: error.name
+        })
     })
 })
 

@@ -10,6 +10,10 @@ import { AlertifyService } from 'src/app/services/alertify.service';
 export class MemberListComponent implements OnInit {
 
   allUserDetails: any
+  allUserDetailsLength = false
+  pagination: any = { currentPage: 1 }
+  genderList = [{ value: 'male', name: 'Males' }, { value: 'female', name: 'Females' }]
+  userParams: any = {}
 
   constructor(
     private userService: UserService,
@@ -20,11 +24,28 @@ export class MemberListComponent implements OnInit {
     this.loadUsers()
   }
 
+  pageChanged(pageNumber) {
+    this.pagination.previousPage = pageNumber - 1
+    this.pagination.currentPage = pageNumber
+    this.pagination.nextPage = pageNumber + 1
+    this.loadUsers()
+  }
+
+  resetFilter() {
+    this.userParams = {}
+    this.loadUsers()
+  }
+
   loadUsers() {
-    this.userService.getAllUsers().subscribe(data => {
-      this.allUserDetails = data
+    this.userService.getAllUsers(this.pagination.currentPage, this.userParams).subscribe((userDetails: { details, pagination }) => {
+      this.allUserDetails = userDetails.details
+      this.pagination = userDetails.pagination
+      if(this.allUserDetails[0])
+      this.userParams.gender = this.allUserDetails[0].gender
+      if (!this.allUserDetails[0])
+      this.allUserDetailsLength = true
     }, error => {
-      this.alertifyService.error(error.error.message || error.error.error.message )
+      this.alertifyService.error(error.error.message || error.error.error.message)
     })
   }
 
