@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const fs = require('fs')
+const fs = require('fs');
 const checkAuth = require('../middleware/check-auth');
 
 require('../models/Photo');

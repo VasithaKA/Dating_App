@@ -27,6 +27,7 @@ const fileFilter = (req, file, cb) => {
 // Routes require
 const userRoutes = require("./api/routes/users")
 const photoRoutes = require("./api/routes/photos")
+const likeRoutes = require("./api/routes/likes")
 
 app.use(morgan("dev"))
 
@@ -66,6 +67,7 @@ app.use((req, res, next) => {
 // Routes which should handle requests
 app.use("/api/users", userRoutes)
 app.use("/api/photos", photoRoutes)
+app.use("/api/likes", likeRoutes)
 
 app.use((req, res, next) => {
     const error = new Error("Not found");

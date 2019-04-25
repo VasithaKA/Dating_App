@@ -1,9 +1,5 @@
-<div  *ngIf="allUserDetails && !allUserDetailsLength" class="text-center mt-3">
-  <h2>{{pagination.totalUsers}} matches found</h2>
-</div>
-
-<div  *ngIf="allUserDetailsLength" class="text-center mt-3">
-  <h2>No matches found</h2>
+<div class="text-center mt-3">
+  <h2>{{pagination.totalUsers ? pagination.totalUsers : 'No'}} matches found</h2>
 </div>
 
 <div *ngIf="pagination && allUserDetails" class="container mt-5">
