@@ -17,8 +17,9 @@ router.post('/:id', checkAuth, async (req, res) => {
     await User.findById(req.params.id).then(async user => {
         await Like.findOne({ likerId: req.loggedInUserData._id, likeeId: req.params.id }).then(async alreadyLiked => {
             if (alreadyLiked) {
-                return res.status(409).json({
-                    message: "You already like this user."
+                Like.findOneAndDelete({ likerId: req.loggedInUserData._id, likeeId: req.params.id }).exec()
+                return res.status(200).json({
+                    message: "You have disliked " + user.knownAs + "."
                 })
             }
             const like = new Like({
@@ -27,7 +28,7 @@ router.post('/:id', checkAuth, async (req, res) => {
             })
             await like.save().then(() => {
                 res.status(200).json({
-                    message: "You have liked " + user.knownAs
+                    message: "You have liked " + user.knownAs + "."
                 })
             }).catch(err => {
                 res.status(500).json({
@@ -63,7 +64,8 @@ router.get('/likees', checkAuth, async (req, res) => {
                 knownAs: element.likeeId.knownAs,
                 city: element.likeeId.city,
                 age: age,
-                like_id: element._id
+                like_id: element._id,
+                likeThisPerson: true
             }
             if (element.likeeId.photos[0]) {
                 object.photoUrl = element.likeeId.photos[0].url
@@ -125,9 +127,20 @@ router.get('/likers', checkAuth, async (req, res) => {
             details.push(object)
         });
         pagination = { previousPage: page - 1, currentPage: page, nextPage: page + 1, lastPage: Math.ceil(totalLikes / USERS_PER_PAGE), totalLikes: totalLikes }
-        await res.status(200).json({
-            details,
-            pagination
+        return { details, pagination }
+    }).then(async data => {
+        await Like.find({ likerId: req.loggedInUserData._id }).then(likes => {
+            likes.forEach(likesElement => {
+                data.details.forEach(async element => {
+                    if (likesElement.likeeId == element._id.toString()) {
+                        return element.likeThisPerson = true;
+                    }
+                });
+            });
+        })
+        res.status(200).json({
+            details: data.details,
+            pagination: data.pagination
         })
     }).catch(err => {
         res.status(500).json({

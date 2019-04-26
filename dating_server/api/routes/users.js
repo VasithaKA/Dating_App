@@ -12,6 +12,9 @@ const USERS_PER_PAGE = 6;
 require('../models/User');
 const User = mongoose.model('users');
 
+require('../models/Like');
+const Like = mongoose.model('likes');
+
 //SignUp a User
 router.post('/signup', async (req, res) => {
     await User.findOne({ userName: req.body.userName }).exec().then(existingUserName => {
@@ -113,7 +116,7 @@ router.get('/', checkAuth, async (req, res) => {
     const gender = req.query.gender || userFilter.setGender(req.loggedInUserData.gender)
     const minAge = +req.query.minAge || 18
     const maxAge = +req.query.maxAge || 99
-    const orderedList =  req.query.orderedList || "lastActive"
+    const orderedList = req.query.orderedList || "lastActive"
     await User.find().where('gender', gender).sort('-lastActive').populate('photos', { url: 1, _id: 0 }, { isMain: true }).then(async Users => {
         var unfilteredDetails = []
         await Users.forEach(element => {
@@ -146,14 +149,25 @@ router.get('/', checkAuth, async (req, res) => {
         })
         var details;
         if (orderedList === "created") {
-            details = await unfilteredDetails.sort(function(a, b) { return b.createdDate - a.createdDate }).slice((page - 1) * USERS_PER_PAGE,page*USERS_PER_PAGE)
+            details = await unfilteredDetails.sort(function (a, b) { return b.createdDate - a.createdDate }).slice((page - 1) * USERS_PER_PAGE, page * USERS_PER_PAGE)
         } else if (orderedList === "lastActive") {
-            details = await unfilteredDetails.slice((page - 1) * USERS_PER_PAGE,page*USERS_PER_PAGE)
+            details = await unfilteredDetails.slice((page - 1) * USERS_PER_PAGE, page * USERS_PER_PAGE)
         }
         pagination = { previousPage: page - 1, currentPage: page, nextPage: page + 1, lastPage: Math.ceil(unfilteredDetails.length / USERS_PER_PAGE), totalUsers: unfilteredDetails.length }
-        await res.status(200).json({
-            details,
-            pagination
+        return { details, pagination }
+    }).then(async data => {
+        await Like.find({ likerId: req.loggedInUserData._id }).then(likes => {
+            likes.forEach(likesElement => {
+                data.details.forEach(async element => {
+                    if (likesElement.likeeId == element._id.toString()) {
+                        return element.likeThisPerson = true;
+                    }
+                });
+            });
+        })
+        res.status(200).json({
+            details: data.details,
+            pagination: data.pagination
         })
     }).catch(error => {
         return res.status(500).json({
