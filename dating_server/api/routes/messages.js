@@ -21,8 +21,8 @@ router.post('/:id', checkAuth, async (req, res) => {
     })
     message.save().then(result => {
         Message.findById(result._id)
-            .populate({ path: 'senderId', select: 'knownAs', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
-            .populate({ path: 'recipientId', select: 'knownAs', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
+            .populate({ path: 'senderId', select: 'knownAs gender', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
+            .populate({ path: 'recipientId', select: 'knownAs gender', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
             .then(data => {
                 const response = {
                     _id: data._id,
@@ -33,12 +33,12 @@ router.post('/:id', checkAuth, async (req, res) => {
                     senderDetails: {
                         _id: data.senderId._id,
                         knownAs: data.senderId.knownAs,
-                        photoUrl: data.senderId.photos[0].url
+                        photoUrl: data.senderId.photos.length !== 0 ? data.senderId.photos[0].url : data.senderId.gender === "male" ? "https://www.bootdey.com/img/Content/avatar/avatar7.png" : "http://www.cocoonbag.com/Content/images/feedback2.png"
                     },
                     receiverDetails: {
                         _id: data.recipientId._id,
                         knownAs: data.recipientId.knownAs,
-                        photoUrl: data.recipientId.photos[0].url
+                        photoUrl: data.recipientId.photos.length !== 0 ? data.recipientId.photos[0].url : data.recipientId.gender === "male" ? "https://www.bootdey.com/img/Content/avatar/avatar7.png" : "http://www.cocoonbag.com/Content/images/feedback2.png"
                     }
                 }
                 res.status(201).json(response)
@@ -55,7 +55,7 @@ router.post('/:id', checkAuth, async (req, res) => {
 router.get('/', checkAuth, async (req, res) => {
     Message.find({ recipientId: req.loggedInUserData._id, isRead: false })
         .sort('senderId -dateSent')
-        .populate({ path: 'senderId', select: 'knownAs', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
+        .populate({ path: 'senderId', select: 'knownAs gender', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
         .then(unreadMessages => {
             const mapArray = unreadMessages.map(element => {
                 return {
@@ -66,7 +66,7 @@ router.get('/', checkAuth, async (req, res) => {
                     senderDetails: {
                         _id: element.senderId._id,
                         knownAs: element.senderId.knownAs,
-                        photoUrl: element.senderId.photos[0].url
+                        photoUrl: element.senderId.photos.length !== 0 ? element.senderId.photos[0].url : element.senderId.gender === "male" ? "https://www.bootdey.com/img/Content/avatar/avatar7.png" : "http://www.cocoonbag.com/Content/images/feedback2.png"
                     }
                 }
             })
@@ -126,12 +126,12 @@ router.get('/:id', checkAuth, async (req, res) => {
         .updateMany({ isRead: true, dateRead: new Date() })
         .then(updateList => {
             Message.find({ senderId: req.loggedInUserData._id, recipientId: req.params.id })
-                .populate({ path: 'senderId', select: 'knownAs', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
-                .populate({ path: 'recipientId', select: 'knownAs', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
+                .populate({ path: 'senderId', select: 'knownAs gender', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
+                .populate({ path: 'recipientId', select: 'knownAs gender', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
                 .then(sendMessages => {
                     Message.find({ senderId: req.params.id, recipientId: req.loggedInUserData._id })
-                        .populate({ path: 'senderId', select: 'knownAs', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
-                        .populate({ path: 'recipientId', select: 'knownAs', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
+                        .populate({ path: 'senderId', select: 'knownAs gender', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
+                        .populate({ path: 'recipientId', select: 'knownAs gender', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
                         .then(receiveMessages => {
                             const chatDetails = sendMessages.concat(receiveMessages).sort((a, b) => { return a.dateSent - b.dateSent })
                             const response = chatDetails.map(element => {
@@ -144,15 +144,16 @@ router.get('/:id', checkAuth, async (req, res) => {
                                     senderDetails: {
                                         _id: element.senderId._id,
                                         knownAs: element.senderId.knownAs,
-                                        photoUrl: element.senderId.photos[0].url
+                                        photoUrl: element.senderId.photos.length !== 0 ? element.senderId.photos[0].url : element.senderId.gender === "male" ? "https://www.bootdey.com/img/Content/avatar/avatar7.png" : "http://www.cocoonbag.com/Content/images/feedback2.png"
                                     },
                                     receiverDetails: {
                                         _id: element.recipientId._id,
                                         knownAs: element.recipientId.knownAs,
-                                        photoUrl: element.recipientId.photos[0].url
+                                        photoUrl: element.recipientId.photos.length !== 0 ? element.recipientId.photos[0].url : element.recipientId.gender === "male" ? "https://www.bootdey.com/img/Content/avatar/avatar7.png" : "http://www.cocoonbag.com/Content/images/feedback2.png"
                                     }
                                 }
                             })
+
                             res.status(200).json({response:response,updateList:updateList.n})
                         }).catch(err => {
                             res.status(500).json({

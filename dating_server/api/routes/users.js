@@ -217,7 +217,6 @@ router.get('/:id', checkAuth, async (req, res) => {
                     return response.likeThisPerson = true;
                 }
             });
-            console.log(response)
             res.status(200).json(response)
         }).catch(error => {
             res.status(500).json({
