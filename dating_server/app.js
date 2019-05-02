@@ -24,6 +24,9 @@ const fileFilter = (req, file, cb) => {
     }
 }
 
+//Database config
+const database = require('./config/database')
+
 // Routes require
 const userRoutes = require("./api/routes/users")
 const photoRoutes = require("./api/routes/photos")
@@ -42,7 +45,7 @@ app.use(express.static('images'))
 mongoose.set('useFindAndModify', false);
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/datingAppDB', { useNewUrlParser: true })
+mongoose.connect(database.mongoURI, { useNewUrlParser: true })
     .then(() => console.log('MogoDB Connected...'))
     .catch(err => console.log(err))
 
