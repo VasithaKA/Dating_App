@@ -6,6 +6,7 @@ import { JwtModule } from '@auth0/angular-jwt';
 import { NgxGalleryModule } from 'ngx-gallery';
 import { FileUploadModule } from 'ng2-file-upload';
 import {TimeAgoPipe} from 'time-ago-pipe';
+import { TabsModule } from 'ngx-bootstrap';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -20,6 +21,8 @@ import { MemberDetailComponent } from './members/member-detail/member-detail.com
 import { MemberEditComponent } from './members/member-edit/member-edit.component';
 import { PreventUnsavedChangesGuard } from './guard/prevent-unsaved-changes.guard';
 import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
+import { MemberMessagesComponent } from './members/member-messages/member-messages.component';
+import { MemberDetailResolver } from './resolvers/member-detail.resolver';
 
 export function tokenGetter() {
    return localStorage.getItem('token')
@@ -38,7 +41,8 @@ export function tokenGetter() {
       MemberDetailComponent,
       MemberEditComponent,
       PhotoEditorComponent,
-      TimeAgoPipe
+      TimeAgoPipe,
+      MemberMessagesComponent
    ],
    imports: [
       BrowserModule,
@@ -52,10 +56,12 @@ export function tokenGetter() {
             tokenGetter: tokenGetter
          }
       }),
+      TabsModule.forRoot(),
       NgxGalleryModule
    ],
    providers: [
-      PreventUnsavedChangesGuard
+      PreventUnsavedChangesGuard,
+      MemberDetailResolver
    ],
    bootstrap: [
       AppComponent

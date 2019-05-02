@@ -184,24 +184,45 @@ router.get('/:id', checkAuth, async (req, res) => {
                 message: err.name
             })
         }
-        var photoUrl
+        const response = {
+            _id: result._id,
+            knownAs: result.knownAs,
+            introduction: result.introduction,
+            lookingFor: result.lookingFor,
+            interests: result.interests,
+            photos: result.photos,
+            createdDate: result.createdDate,
+            city: result.city,
+            country: result.country,
+            dateOfBirth: result.dateOfBirth,
+            gender: result.gender,
+            lastActive: result.lastActive
+        }
         result.photos.forEach(element => {
             if (element.isMain === true) {
-                photoUrl = element.url
+                response.photoUrl = element.url
             }
         });
-        if (photoUrl === undefined) {
+        if (response.photoUrl === undefined) {
             if (result.gender === 'male') {
-                photoUrl = "https://www.bootdey.com/img/Content/avatar/avatar7.png"
+                response.photoUrl = "https://www.bootdey.com/img/Content/avatar/avatar7.png"
             } else {
-                photoUrl = "http://www.cocoonbag.com/Content/images/feedback2.png"
+                response.photoUrl = "http://www.cocoonbag.com/Content/images/feedback2.png"
             }
         }
-        var age = ageCalculator(result.dateOfBirth, res)
-        res.status(200).json({
-            result,
-            age,
-            photoUrl
+        response.age = ageCalculator(result.dateOfBirth, res)
+        Like.find({ likerId: req.loggedInUserData._id }).then(likes => {
+            likes.forEach(likesElement => {
+                if (likesElement.likeeId == result._id.toString()) {
+                    return response.likeThisPerson = true;
+                }
+            });
+            console.log(response)
+            res.status(200).json(response)
+        }).catch(error => {
+            res.status(500).json({
+                message: error.name
+            })
         })
     })
 })

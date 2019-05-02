@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { UserService } from 'src/app/services/user.service';
-import { AlertifyService } from 'src/app/services/alertify.service';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gallery';
+import { TabsetComponent } from 'ngx-bootstrap';
+import { LikeService } from 'src/app/services/like.service';
+import { AlertifyService } from 'src/app/services/alertify.service';
 
 @Component({
   selector: 'app-member-detail',
@@ -10,19 +11,27 @@ import { NgxGalleryOptions, NgxGalleryImage, NgxGalleryAnimation } from 'ngx-gal
   styleUrls: ['./member-detail.component.css']
 })
 export class MemberDetailComponent implements OnInit {
+  @ViewChild('memberTabs') memberTabs: TabsetComponent
 
   aUserDetails: any
   galleryOptions: NgxGalleryOptions[];
   galleryImages: NgxGalleryImage[];
 
   constructor(
-    private userService: UserService,
+    private likeService: LikeService,
     private alertifyService: AlertifyService,
     private activatedRoute: ActivatedRoute
   ) { }
 
   ngOnInit() {
-    this.loadUser()
+    this.activatedRoute.data.subscribe(data => {
+      this.aUserDetails = data['aUserDetails'];
+    });
+
+    this.activatedRoute.queryParams.subscribe(params => {
+      const selectedTab = params['tab'];
+      this.memberTabs.tabs[selectedTab > 0 ? selectedTab : 0].active = true;
+    });
 
     this.galleryOptions = [
       {
@@ -33,21 +42,13 @@ export class MemberDetailComponent implements OnInit {
         imageAnimation: NgxGalleryAnimation.Slide
       }
     ]
+    this.galleryImages = this.getImages();
 
-  }
-
-  loadUser() {
-    this.userService.getAUser(this.activatedRoute.snapshot.paramMap.get('id')).subscribe(userData => {
-      this.aUserDetails = userData
-      this.galleryImages = this.getImages()
-    }, error => {
-      this.alertifyService.error(error.error.message || error.error.error.message)
-    })
   }
 
   getImages() {
     const imgUrl = []
-    this.aUserDetails.result.photos.forEach(element => {
+    this.aUserDetails.photos.forEach(element => {
       imgUrl.push({
         small: element.url,
         medium: element.url,
@@ -56,6 +57,19 @@ export class MemberDetailComponent implements OnInit {
       })
     });
     return imgUrl
+  }
+
+  sendLike(id) {
+    this.likeService.sendLike(id).subscribe((response: { message }) => {
+      this.alertifyService.success(response.message)
+      this.aUserDetails.likeThisPerson = this.aUserDetails.likeThisPerson === true ? false : true
+    }, error => {
+      this.alertifyService.error(error.error.message || error.error.error.message)
+    })
+  }
+
+  selectTab(tabId) {
+    this.memberTabs.tabs[tabId].active = true
   }
 
 }

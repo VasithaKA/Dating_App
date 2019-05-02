@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { AlertifyService } from '../services/alertify.service';
 import { Router } from '@angular/router';
+import { MessageService } from '../services/message.service';
 
 @Component({
   selector: 'app-nav',
@@ -15,6 +16,7 @@ export class NavComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private alertifyService: AlertifyService,
+    private messageService:MessageService,
     private router: Router
   ) { }
 

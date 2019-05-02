@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { AlertifyService } from './alertify.service';
+import { MessageService } from './message.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,7 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
+    private messageService:MessageService,
     private alertifyService: AlertifyService) { }
 
   get getLoginDetails() {
@@ -31,6 +33,7 @@ export class AuthService {
         this.alertifyService.success(res.message)
         localStorage.setItem('token', res.token)
         localStorage.setItem('mainPhotoUrl', res.mainPhotoUrl)
+        this.messageService.getUnreadMessagesCount().subscribe()
       }
     }))
   }

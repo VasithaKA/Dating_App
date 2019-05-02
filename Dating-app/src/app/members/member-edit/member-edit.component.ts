@@ -48,11 +48,11 @@ export class MemberEditComponent implements OnInit {
 
   setEditFormValues() {
     this.editForm.patchValue({
-      introduction: this.userDetails.result.introduction,
-      lookingFor: this.userDetails.result.lookingFor,
-      interests: this.userDetails.result.interests,
-      city: this.userDetails.result.city,
-      country: this.userDetails.result.country
+      introduction: this.userDetails.introduction,
+      lookingFor: this.userDetails.lookingFor,
+      interests: this.userDetails.interests,
+      city: this.userDetails.city,
+      country: this.userDetails.country
     })
   }
 

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { MessageService } from '../services/message.service';
+import { AlertifyService } from '../services/alertify.service';
 
 @Component({
   selector: 'app-messages',
@@ -7,9 +9,23 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MessagesComponent implements OnInit {
 
-  constructor() { }
+  messages: any
+
+  constructor(
+    private messageService:MessageService,
+    private alertifyService:AlertifyService
+  ) { }
 
   ngOnInit() {
+    this.loadMessages()
+  }
+
+  loadMessages() {
+    this.messageService.getUnreadMessages().subscribe(messages => {
+      this.messages = messages
+    },error =>{
+      this.alertifyService.error(error.error)
+    })
   }
 
 }

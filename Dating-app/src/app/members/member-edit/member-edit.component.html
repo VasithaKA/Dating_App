@@ -12,12 +12,12 @@
   <div class="row">
     <div class="col-sm-4">
       <div class="card">
-        <img src="{{userDetails.photoUrl}}" alt="{{userDetails.result.knownAs}}" class="card-img-top img-thumbnail">
+        <img src="{{userDetails.photoUrl}}" alt="{{userDetails.knownAs}}" class="card-img-top img-thumbnail">
 
         <div class="card-body">
           <div>
             <strong>Location</strong>
-            <p>{{userDetails.result.city}}, {{userDetails.result.country}}</p>
+            <p>{{userDetails.city}}, {{userDetails.country}}</p>
           </div>
           <div>
             <strong>Age:</strong>
@@ -25,16 +25,17 @@
           </div>
           <div>
             <strong>Last Active</strong>
-            <p>{{userDetails.result.lastActive | timeAgo}}</p>
+            <p>{{userDetails.lastActive | timeAgo}}</p>
           </div>
           <div>
             <strong>Member since</strong>
-            <p>{{userDetails.result.createdDate | date}}</p>
+            <p>{{userDetails.createdDate | date}}</p>
           </div>
         </div>
 
         <div class="card-footer">
-          <button [disabled]="!editForm.dirty" (click)="updateUser()" class="btn btn-success btn-block">Save Changes</button>
+          <button [disabled]="!editForm.dirty" (click)="updateUser()" class="btn btn-success btn-block">Save
+            Changes</button>
         </div>
 
       </div>
@@ -42,15 +43,9 @@
 
     <div class="col-sm-8">
 
-      <div class="tablets rounded">
-        <nav class="navs">
-          <div class="nav nav-tabs" role="tablist">
-            <a class="nav-item nav-link active" data-toggle="tab" href="#editProfile">Edit Profile</a>
-            <a class="nav-item nav-link" data-toggle="tab" href="#editPhotos">Photos</a>
-          </div>
-        </nav>
-        <div class="tab-content">
-          <div class="tab-pane fade show active" id="editProfile">
+      <div class="tab-panel">
+        <tabset class="member-tabset">
+          <tab heading="Edit Profile">
             <form [formGroup]="editForm">
               <h4>Description</h4>
               <textarea class="textarea" formControlName="introduction" rows="6"></textarea>
@@ -66,11 +61,12 @@
                 <input formControlName="country" type="text" class="form-control">
               </div>
             </form>
-          </div>
-          <div class="tab-pane fade" id="editPhotos">
-            <app-photo-editor [photos]="userDetails.result.photos" (getMemberPhotoChange)="updateMainPhoto($event)"></app-photo-editor>
-          </div>
-        </div>
+          </tab>
+          <tab heading="Photos">
+            <app-photo-editor [photos]="userDetails.photos" (getMemberPhotoChange)="updateMainPhoto($event)">
+            </app-photo-editor>
+          </tab>
+        </tabset>
       </div>
 
     </div>

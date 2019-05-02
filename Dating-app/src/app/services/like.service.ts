@@ -19,7 +19,7 @@ export class LikeService {
     if (page) {
       params = params.append('page', page)
     }
-    return this.http.get(this.likeUrl + "/" + route, {params})
+    return this.http.get(this.likeUrl + "/" + route, { params })
   }
 
 }
