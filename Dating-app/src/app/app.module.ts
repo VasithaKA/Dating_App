@@ -23,6 +23,7 @@ import { PreventUnsavedChangesGuard } from './guard/prevent-unsaved-changes.guar
 import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
 import { MemberMessagesComponent } from './members/member-messages/member-messages.component';
 import { MemberDetailResolver } from './resolvers/member-detail.resolver';
+import { ListsResolver } from './resolvers/lists.resolver';
 
 export function tokenGetter() {
    return localStorage.getItem('token')
@@ -61,7 +62,8 @@ export function tokenGetter() {
    ],
    providers: [
       PreventUnsavedChangesGuard,
-      MemberDetailResolver
+      MemberDetailResolver,
+      ListsResolver
    ],
    bootstrap: [
       AppComponent

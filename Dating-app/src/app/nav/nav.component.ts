@@ -31,7 +31,6 @@ export class NavComponent implements OnInit {
   login() {
     this.isLodding = true
     if (this.logInForm.valid) {
-      console.log(this.logInForm.value)
       this.authService.login(this.logInForm.value).subscribe(() => {
         this.isLodding = false
       }, error => {
@@ -47,7 +46,7 @@ export class NavComponent implements OnInit {
   }
 
   isLoggedIn() {
-    return this.authService.isLoggedIn()
+    return this.authService.isLoggedIn
   }
 
   logOut() {

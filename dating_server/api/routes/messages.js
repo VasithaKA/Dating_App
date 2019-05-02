@@ -57,9 +57,6 @@ router.get('/', checkAuth, async (req, res) => {
         .sort('senderId -dateSent')
         .populate({ path: 'senderId', select: 'knownAs', populate: { path: 'photos', select: 'url', match: { isMain: true } } })
         .then(unreadMessages => {
-            if (unreadMessages.length === 0) {
-                return res.status(404).json("No new messages found")
-            }
             const mapArray = unreadMessages.map(element => {
                 return {
                     _id: element._id,

@@ -27,7 +27,7 @@
 
 </div>
 
-<div *ngIf="likeUserDetailsLength" class="row justify-content-md-center">
+<div *ngIf="likeUserDetails.length !== 0" class="row justify-content-md-center">
   <ul class="pagination">
     <li *ngIf="pagination.currentPage > 2" class="page-item"><a (click)="pageChanged(1)" class="page-link">&laquo;</a>
     </li>

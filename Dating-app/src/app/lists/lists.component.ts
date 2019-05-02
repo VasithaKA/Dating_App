@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertifyService } from '../services/alertify.service';
 import { LikeService } from '../services/like.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-lists',
@@ -10,17 +11,20 @@ import { LikeService } from '../services/like.service';
 export class ListsComponent implements OnInit {
 
   likeUserDetails: any
-  likeUserDetailsLength = false
   pagination: any = { currentPage: 1 }
   route = "likers"
 
   constructor(
     private likeService: LikeService,
-    private alertifyService: AlertifyService
+    private alertifyService: AlertifyService,
+    private activatedRoute: ActivatedRoute
   ) { }
 
   ngOnInit() {
-    this.loadUsers()
+    this.activatedRoute.data.subscribe(data => {
+      this.likeUserDetails = data['userDetails'].details;
+      this.pagination = data['userDetails'].pagination;
+    });
   }
 
   pageChanged(pageNumber) {
@@ -33,7 +37,6 @@ export class ListsComponent implements OnInit {
   toggleRoute() {
     this.likeUserDetails = [];
     this.pagination = { currentPage: 1 }
-    this.likeUserDetailsLength = false
     this.loadUsers()
   }
 
@@ -41,7 +44,6 @@ export class ListsComponent implements OnInit {
     this.likeService.getLikeUserDetails(this.route, this.pagination.currentPage).subscribe((userDetails: { details, pagination }) => {
         this.likeUserDetails = userDetails.details
         this.pagination = userDetails.pagination
-        this.likeUserDetailsLength = true
     }, error => {
       this.alertifyService.error(error.error.message || error.error.error.message)
     })

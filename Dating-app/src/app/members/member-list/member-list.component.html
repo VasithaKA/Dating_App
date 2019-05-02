@@ -45,7 +45,7 @@
       <app-member-card [user]="aUserDetails"></app-member-card>
     </div>
   </div>
-  <div *ngIf="!allUserDetailsLength" class="row justify-content-md-center">
+  <div *ngIf="allUserDetails.length !== 0" class="row justify-content-md-center">
       <ul class="pagination">
         <li *ngIf="pagination.currentPage > 2" class="page-item"><a (click)="pageChanged(1)" class="page-link">&laquo;</a></li>
         <li *ngIf="pagination.currentPage > 1" class="page-item"><a (click)="pageChanged(pagination.previousPage)" class="page-link">‹</a></li>

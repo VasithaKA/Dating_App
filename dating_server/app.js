@@ -2,10 +2,14 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const multer = require('multer')
+const multer = require('multer');
+const helmet = require('helmet');
+const path = require('path');
 // const session = require('express-session');
 
 const app = express();
+
+app.use(express.static(path.join(__dirname, 'wwwroot')));
 
 const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -34,13 +38,14 @@ const likeRoutes = require("./api/routes/likes")
 const messageRoutes = require("./api/routes/messages")
 
 app.use(morgan("dev"))
+app.use(helmet())
 
 app.use('/profile_pictures', express.static('profile_pictures'))
 app.use('/fault_images', express.static('fault_images'))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('file'))
-app.use(express.static('images'))
+app.use(express.static(path.join(__dirname, 'images')))
 
 mongoose.set('useFindAndModify', false);
 
@@ -73,6 +78,9 @@ app.use("/api/users", userRoutes)
 app.use("/api/photos", photoRoutes)
 app.use("/api/likes", likeRoutes)
 app.use("/api/messages", messageRoutes)
+app.get('*', (req, res) => {
+    return res.sendFile(path.join(__dirname, 'wwwroot/index.html'))
+})
 
 app.use((req, res, next) => {
     const error = new Error("Not found");

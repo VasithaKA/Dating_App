@@ -23,6 +23,8 @@ export class MessagesComponent implements OnInit {
   loadMessages() {
     this.messageService.getUnreadMessages().subscribe(messages => {
       this.messages = messages
+      if (!this.messages[0])
+      this.alertifyService.error("No new messages found")
     },error =>{
       this.alertifyService.error(error.error)
     })

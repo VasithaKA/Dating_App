@@ -98,11 +98,6 @@ router.get('/likers', checkAuth, async (req, res) => {
         totalLikes = numberOfLikes;
         return await Like.find({ likeeId: req.loggedInUserData._id }, { likerId: 1 }).skip((page - 1) * USERS_PER_PAGE).limit(USERS_PER_PAGE).populate({ path: 'likerId', populate: { path: 'photos', select: { url: 1, _id: 0 }, match: { isMain: true } } })
     }).then(async result => {
-        if (result.length === 0) {
-            return res.status(404).json({
-                message: "No likes"
-            })
-        }
         var details = []
         result.forEach(element => {
             var age = ageCalculator(element.likerId.dateOfBirth, res);

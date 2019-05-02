@@ -42,7 +42,7 @@ export class AuthService {
     return this.http.post(this.userUrl + "signup", registerDetails)
   }
 
-  isLoggedIn() {
+  get isLoggedIn() {
     return !this.jwtHelper.isTokenExpired(localStorage.getItem('token'))
   }
 
