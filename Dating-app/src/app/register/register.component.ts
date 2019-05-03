@@ -1,5 +1,5 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { AlertifyService } from '../services/alertify.service';
 import { Router } from '@angular/router';
@@ -24,16 +24,26 @@ export class RegisterComponent implements OnInit {
   }
 
   registerForm = new FormGroup({
-    userName: new FormControl('', Validators.required),
+    userName: new FormControl('', [
+      Validators.required,
+      Validators.minLength(4),
+      Validators.pattern("[a-zA-Z]*")
+    ]),
     password: new FormControl('',
       [
         Validators.required,
         Validators.minLength(4)
       ]),
     confirmPassword: new FormControl('', Validators.required),
-    knownAs: new FormControl('', Validators.required),
+    knownAs: new FormControl('', [
+      Validators.required,
+      Validators.pattern("[a-zA-Z]*")
+    ]),
     gender: new FormControl('male'),
-    dateOfBirth: new FormControl(null, Validators.required),
+    dateOfBirth: new FormControl(null, [
+      Validators.required,
+      this.checkAdult
+    ]),
     city: new FormControl('', Validators.required),
     country: new FormControl('', Validators.required)
   }, this.passwordMatchValidator);
@@ -68,6 +78,15 @@ export class RegisterComponent implements OnInit {
 
   passwordMatchValidator(form) {
     return form.get('password').value === form.get('confirmPassword').value ? null : { 'mismatch': true }
+  }
+
+  checkAdult(control: AbstractControl): ValidationErrors | null {
+    if (control.value) {
+      if(new Date(new Date().getTime() - new Date(control.value).getTime()).getFullYear() < 1988) {
+        return { adult: true }
+      }
+    }
+    return null
   }
 
   register() {

@@ -57,7 +57,7 @@ router.get('/likees', checkAuth, async (req, res) => {
         }
         var details = []
         result.forEach(element => {
-            var age = ageCalculator(element.likeeId.dateOfBirth, res);
+            var age = ageCalculator(element.likeeId.dateOfBirth);
             const object = {
                 _id: element.likeeId._id,
                 gender: element.likeeId.gender,
@@ -100,7 +100,7 @@ router.get('/likers', checkAuth, async (req, res) => {
     }).then(async result => {
         var details = []
         result.forEach(element => {
-            var age = ageCalculator(element.likerId.dateOfBirth, res);
+            var age = ageCalculator(element.likerId.dateOfBirth);
             const object = {
                 _id: element.likerId._id,
                 gender: element.likerId.gender,

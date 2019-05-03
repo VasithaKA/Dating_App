@@ -11,7 +11,7 @@
     transition-timing-function: ease-in;
     cursor: pointer;
     object-fit: cover;
-    width: 158px;
+    width: 100%;
     height: 200px;
 }
 

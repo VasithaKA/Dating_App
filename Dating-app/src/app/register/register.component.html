@@ -6,7 +6,11 @@
     <label for="userName" class="col-sm-3">User Name</label>
     <div class="col-sm-9">
       <input type="text" class="form-control" formControlName="userName" placeholder="User Name">
-      <small *ngIf="userName.errors && userName.touched" class="font-italic text-danger">*User Name is required.</small>
+      <div *ngIf="userName.errors && userName.touched" class="font-italic text-danger">
+        <small *ngIf="userName.errors.required">*User Name is required.</small>
+        <small *ngIf="userName.errors.pattern">*Can only use letters for User Name.</small>
+        <small *ngIf="userName.errors.minlength">*User Name should be minimum {{userName.errors.minlength.requiredLength}} characters.</small>
+      </div>
     </div>
   </div>
 
@@ -14,7 +18,10 @@
     <label for="dateOfBirth" class="col-sm-3">Known As</label>
     <div class="col-sm-9">
       <input class="form-control" placeholder="Known as" formControlName="knownAs">
-      <small *ngIf="knownAs.errors && knownAs.touched" class="font-italic text-danger">*Known as is required.</small>
+      <div *ngIf="knownAs.errors && knownAs.touched" class="font-italic text-danger">
+        <small *ngIf="knownAs.errors.required">*Known as is required.</small>
+        <small *ngIf="knownAs.errors.pattern">*Can only use letters.</small>
+      </div>
     </div>
   </div>
 
@@ -32,7 +39,10 @@
     <label for="dateOfBirth" class="col-sm-3">Date of Birth</label>
     <div class="col-sm-9">
       <input class="form-control" placeholder="Date of Birth" formControlName="dateOfBirth" type="date">
-      <small *ngIf="dateOfBirth.errors && dateOfBirth.touched" class="font-italic text-danger">*Date of Birth is required.</small>
+      <div *ngIf="dateOfBirth.errors && dateOfBirth.touched"  class="font-italic text-danger">
+        <small *ngIf="dateOfBirth.errors.required">*Date of Birth is required.</small>
+        <small *ngIf="dateOfBirth.errors.adult">*Age should be above 18.</small>
+      </div>
     </div>
   </div>
 

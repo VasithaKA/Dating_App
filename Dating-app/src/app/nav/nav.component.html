@@ -25,7 +25,7 @@
         <img src="{{authService.mainPhotoUrl}}" class="rounded-circle" alt="Profile Picture">
       </span>
       <a class="dropdown-toggle text-light" data-toggle="dropdown">
-        Welcome {{authService.getLoginDetails.userName}}
+        Welcome {{authService.getLoginDetails.knownAs | titlecase}}
       </a>
       <div class="dropdown-menu">
         <a class="dropdown-item" routerLink="/member/edit"> <i class="fa fa-user"></i> Edit Profile</a>

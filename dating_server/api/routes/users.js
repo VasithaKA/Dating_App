@@ -17,47 +17,51 @@ const Like = mongoose.model('likes');
 
 //SignUp a User
 router.post('/signup', async (req, res) => {
-    await User.findOne({ userName: req.body.userName }).exec().then(existingUserName => {
+    await User.findOne({ userName: req.body.userName.trim().toLowerCase() }).exec().then(existingUserName => {
         if (existingUserName) {
             return res.status(409).json({
                 message: "User Name already in use. Please enter another one."
             })
-        } else {
-            bcrypt.hash(req.body.password, 15, function (err, hash) {
-                if (err) {
-                    return res.status(500).json({
-                        message: err
-                    })
-                } else {
-                    const user = new User({
-                        userName: req.body.userName,
-                        password: hash,
-                        createdDate: new Date().toISOString(),
-                        lastActive: new Date().toISOString(),
-                        gender: req.body.gender,
-                        dateOfBirth: req.body.dateOfBirth,
-                        knownAs: req.body.knownAs,
-                        city: req.body.city,
-                        country: req.body.country
-                    })
-                    user.save().then(result => {
-                        res.status(201).json({
-                            message: "Your account is created"
-                        })
-                    }).catch(error => {
-                        res.status(500).json({
-                            message: error.name
-                        })
-                    })
-                }
+        }
+        if (ageCalculator(new Date(req.body.dateOfBirth)) < 18) {
+            return res.status(409).json({
+                message: "Age should be above 18."
             })
         }
+        bcrypt.hash(req.body.password, 15, function (err, hash) {
+            if (err) {
+                return res.status(500).json({
+                    message: err
+                })
+            } else {
+                const user = new User({
+                    userName: req.body.userName.trim().toLowerCase(),
+                    password: hash,
+                    createdDate: new Date().toISOString(),
+                    lastActive: new Date().toISOString(),
+                    gender: req.body.gender,
+                    dateOfBirth: req.body.dateOfBirth,
+                    knownAs: req.body.knownAs,
+                    city: req.body.city,
+                    country: req.body.country
+                })
+                user.save().then(result => {
+                    res.status(201).json({
+                        message: "Your account is created"
+                    })
+                }).catch(error => {
+                    res.status(500).json({
+                        message: error.name
+                    })
+                })
+            }
+        })
     })
 })
 
 //Login
 router.post('/login', async (req, res, next) => {
-    await User.findOne({ userName: req.body.userName }).populate('photos', { url: 1, _id: 0 }, { isMain: true }).exec().then(foundUser => {
+    await User.findOne({ userName: req.body.userName.trim().toLowerCase() }).populate('photos', { url: 1, _id: 0 }, { isMain: true }).exec().then(foundUser => {
         if (!foundUser) {
             return res.status(401).json({
                 message: "Auth failed"
@@ -77,7 +81,7 @@ router.post('/login', async (req, res, next) => {
                 })
             }
             if (result) {
-                const token = jwt.sign({ userName: foundUser.userName, _id: foundUser._id, gender: foundUser.gender }, process.env.JWT_KEY, { expiresIn: "1h" })
+                const token = jwt.sign({ knownAs: foundUser.knownAs, _id: foundUser._id, gender: foundUser.gender }, process.env.JWT_KEY, { expiresIn: "1h" })
                 return res.status(200).json({
                     message: "Login successful",
                     token: token,
@@ -120,7 +124,7 @@ router.get('/', checkAuth, async (req, res) => {
     await User.find().where('gender', gender).sort('-lastActive').populate('photos', { url: 1, _id: 0 }, { isMain: true }).then(async Users => {
         var unfilteredDetails = []
         await Users.forEach(element => {
-            var age = ageCalculator(element.dateOfBirth, res)
+            var age = ageCalculator(element.dateOfBirth)
             if (age > minAge && age < maxAge) {
                 if (element._id != req.loggedInUserData._id) {
                     const object = {
@@ -210,7 +214,7 @@ router.get('/:id', checkAuth, async (req, res) => {
                 response.photoUrl = "http://www.cocoonbag.com/Content/images/feedback2.png"
             }
         }
-        response.age = ageCalculator(result.dateOfBirth, res)
+        response.age = ageCalculator(result.dateOfBirth)
         Like.find({ likerId: req.loggedInUserData._id }).then(likes => {
             likes.forEach(likesElement => {
                 if (likesElement.likeeId == result._id.toString()) {

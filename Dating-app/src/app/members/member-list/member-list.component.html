@@ -27,7 +27,7 @@
     <button type="button" class="btn btn-info" (click)="resetFilter()" style="margin-left:10px">Reset Filter</button>
 
     <div class="col">
-      <div class="btn-group btn-group-toggle float-right">
+      <div class="btn-group btn-group-toggle float-right mt-1">
         <label [ngClass]="{active: !userParams.orderedList || userParams.orderedList === 'lastActive'}" class="btn btn-secondary">
             <input type="radio" name="orderedList" [(ngModel)]="userParams.orderedList" value="lastActive" (change)="loadUsers()">Last Active
         </label>

@@ -42,40 +42,6 @@ router.post('/:id', checkAuth, async (req, res, next) => {
             })
         })
     })
-
-
-
-
-    // await req.files.forEach(async element => {
-
-    //     const photos = new Photos({
-    //         url: "http://localhost:5000/" + element.filename,
-    //         filePath: element.path,
-    //         description: element.originalname,
-    //         dateAdded: new Date().toISOString(),
-    //         userId: req.params.id
-    //     })
-
-    //     await photos.save()
-    // })
-
-    // await User.findById(req.params.id).then(userDetails => {
-    //     if (userDetails.photos.length === 0) {
-    //         Photos.findOneAndUpdate({ userId: req.params.id }, {isMain: true})
-    //     }
-    // })
-
-    // await Photos.find({ userId: req.params.id }).then(async result => {
-    //     var photoIds = []
-    //     result.forEach(element => {
-    //         photoIds.push(element._id)
-    //     });
-    //     await User.findByIdAndUpdate(req.params.id, { photos: photoIds }).then(async () => {
-    //         await res.status(201).json(
-    //             result
-    //         )
-    //     })
-    // })
 })
 
 //Change the main photo
