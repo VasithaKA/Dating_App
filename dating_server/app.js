@@ -42,8 +42,6 @@ app.use(morgan("dev"))
 app.use(helmet())
 app.use(compression())
 
-app.use('/profile_pictures', express.static('profile_pictures'))
-app.use('/fault_images', express.static('fault_images'))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('file'))
