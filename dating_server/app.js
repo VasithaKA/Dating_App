@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const helmet = require('helmet');
+const compression = require('compression');
 const path = require('path');
 // const session = require('express-session');
 
@@ -39,6 +40,7 @@ const messageRoutes = require("./api/routes/messages")
 
 app.use(morgan("dev"))
 app.use(helmet())
+app.use(compression())
 
 app.use('/profile_pictures', express.static('profile_pictures'))
 app.use('/fault_images', express.static('fault_images'))
